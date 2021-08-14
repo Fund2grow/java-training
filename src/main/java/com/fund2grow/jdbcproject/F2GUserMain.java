@@ -15,13 +15,13 @@ import java.util.Scanner;
  */
 public class F2GUserMain {
     private static Connection conn = null;
-    private static Statement stmt = null;
+    private static final Statement stmt = null;
     private static PreparedStatement pstmt = null;
     private static ResultSet rs = null;
-    private static String USER_INSERT_QUERY = "insert into APP.USER_REG values (?,?)";
-    private static String USER_UPDATE_QUERY = "update APP.USER_REG set PASSWORD=? where USERID=?";
-    private static String USER_DELETE_QUERY = "delete from APP.USER_REG where USERID=?";
-    private static String USER_SELECT_QUERY = "select USERID, PASSWORD from APP.USER_REG";
+    private static final String USER_INSERT_QUERY = "insert into APP.USER_REG values (?,?)";
+    private static final String USER_UPDATE_QUERY = "update APP.USER_REG set PASSWORD=? where USERID=?";
+    private static final String USER_DELETE_QUERY = "delete from APP.USER_REG where USERID=?";
+    private static final String USER_SELECT_QUERY = "select USERID, PASSWORD from APP.USER_REG";
     
     public static void main(String[] args) {
         Scanner sc= new Scanner(System.in);
@@ -36,13 +36,13 @@ public class F2GUserMain {
         createConnection();
         
         if (choice.equalsIgnoreCase("1"))
-            loginUsers();
+            loginUser();
         else if(choice.equalsIgnoreCase("2"))
-            insertUsers();
+            insertUser();
         else if(choice.equalsIgnoreCase("3"))
-            updateUsers();
+            updateUser();
         else
-            deleteUsers();
+            deleteUser();
         //shutdown();
     }
     
@@ -60,7 +60,7 @@ public class F2GUserMain {
         }
     }
     
-    private static void insertUsers()
+    private static void insertUser()
     {
         try
         {
@@ -75,7 +75,7 @@ public class F2GUserMain {
             pstmt = conn.prepareStatement(USER_INSERT_QUERY);
             pstmt.setString(1, userId);
             pstmt.setString(2, userPwd);
-            int noOfRecords = pstmt.executeUpdate();
+            System.out.println(pstmt.executeUpdate() + " user inserted successfully!");
             pstmt.close();
         }
         catch (SQLException sqlExcept)
@@ -84,7 +84,7 @@ public class F2GUserMain {
         }
     }
     
-    private static void updateUsers()
+    private static void updateUser()
     {
         try
         {
@@ -99,7 +99,7 @@ public class F2GUserMain {
             pstmt = conn.prepareStatement(USER_UPDATE_QUERY);
             pstmt.setString(1, userPwd);
             pstmt.setString(2, userId);
-            int noOfRecords = pstmt.executeUpdate();
+            System.out.println(pstmt.executeUpdate() + " user updated successfully!");
             pstmt.close();
         }
         catch (SQLException sqlExcept)
@@ -108,7 +108,7 @@ public class F2GUserMain {
         }
     }
     
-    private static void deleteUsers()
+    private static void deleteUser()
     {
         try
         {
@@ -119,7 +119,7 @@ public class F2GUserMain {
             
             pstmt = conn.prepareStatement(USER_DELETE_QUERY);
             pstmt.setString(1, userId);
-            int noOfRecords = pstmt.executeUpdate();
+            System.out.println(pstmt.executeUpdate() + " user deleted successfully!");
             pstmt.close();
         }
         catch (SQLException sqlExcept)
@@ -128,7 +128,7 @@ public class F2GUserMain {
         }
     }
     
-    private static void loginUsers()
+    private static void loginUser()
     {
         try
         {
