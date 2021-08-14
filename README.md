@@ -1,3 +1,2 @@
-# java-training
-# java-training
+# Java Training Excercises
 
