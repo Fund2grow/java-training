@@ -14,34 +14,35 @@ import java.util.Scanner;
  * @author Administrator
  */
 public class F2GUserMain {
-    private static String dbURL = "jdbc:derby://192.168.1.51:1527/FUND2GROW;create=true;user=DEVUSER;password=Fund2groW$";
-    private static String tableName = "APP.USER_REG";
-    // jdbc Connection
     private static Connection conn = null;
     private static Statement stmt = null;
     private static PreparedStatement pstmt = null;
+    private static ResultSet rs = null;
     private static String USER_INSERT_QUERY = "insert into APP.USER_REG values (?,?)";
+    private static String USER_UPDATE_QUERY = "update APP.USER_REG set PASSWORD=? where USERID=?";
+    private static String USER_DELETE_QUERY = "delete from APP.USER_REG where USERID=?";
+    private static String USER_SELECT_QUERY = "select USERID, PASSWORD from APP.USER_REG";
     
     public static void main(String[] args) {
-        
-        String username = null;
-        String password = null;
         Scanner sc= new Scanner(System.in);
-        
-        F2GUser f2guser = new F2GUser();
-        
-        System.out.println("Enter your username to store: ");
-        username = sc.nextLine();
-        
-        System.out.println("Enter your password to store: ");
-        password = sc.nextLine();
-        
-        f2guser.setUserid(username);
-        f2guser.setPassword(password);
-        
+            
+        System.out.println("------- Welcome to Fun2groW website -------");
+        System.out.println("1. Login user");
+        System.out.println("2. Create user");
+        System.out.println("3. Update user");
+        System.out.println("4. Delete user");
+        System.out.println("Enter your choice:");
+        String choice = sc.nextLine();
         createConnection();
-        insertUsers(f2guser.getUserid(),f2guser.getPassword());
-        //selectRestaurants();
+        
+        if (choice.equalsIgnoreCase("1"))
+            loginUsers();
+        else if(choice.equalsIgnoreCase("2"))
+            insertUsers();
+        else if(choice.equalsIgnoreCase("3"))
+            updateUsers();
+        else
+            deleteUsers();
         //shutdown();
     }
     
@@ -59,10 +60,18 @@ public class F2GUserMain {
         }
     }
     
-    private static void insertUsers(String userId, String userPwd)
+    private static void insertUsers()
     {
         try
         {
+            Scanner sc= new Scanner(System.in);
+            
+            System.out.println("Enter your username to store: ");
+            String userId = sc.nextLine();
+        
+            System.out.println("Enter your password to store: ");
+            String userPwd = sc.nextLine();
+            
             pstmt = conn.prepareStatement(USER_INSERT_QUERY);
             pstmt.setString(1, userId);
             pstmt.setString(2, userPwd);
@@ -75,30 +84,80 @@ public class F2GUserMain {
         }
     }
     
-    private static void selectRestaurants()
+    private static void updateUsers()
     {
         try
         {
-            stmt = conn.createStatement();
-            ResultSet results = pstmt.executeQuery("select * from " + tableName);
-            ResultSetMetaData rsmd = results.getMetaData();
-            int numberCols = rsmd.getColumnCount();
-            for (int i=1; i<=numberCols; i++)
-            {
-                //print Column Names
-                System.out.print(rsmd.getColumnLabel(i)+"\t\t");  
-            }
+            Scanner sc= new Scanner(System.in);
+            
+            System.out.println("Enter your username to update: ");
+            String userId = sc.nextLine();
+        
+            System.out.println("Enter your password to update: ");
+            String userPwd = sc.nextLine();
+            
+            pstmt = conn.prepareStatement(USER_UPDATE_QUERY);
+            pstmt.setString(1, userPwd);
+            pstmt.setString(2, userId);
+            int noOfRecords = pstmt.executeUpdate();
+            pstmt.close();
+        }
+        catch (SQLException sqlExcept)
+        {
+            sqlExcept.printStackTrace();
+        }
+    }
+    
+    private static void deleteUsers()
+    {
+        try
+        {
+            Scanner sc= new Scanner(System.in);
+            
+            System.out.println("Enter your username to delete: ");
+            String userId = sc.nextLine();
+            
+            pstmt = conn.prepareStatement(USER_DELETE_QUERY);
+            pstmt.setString(1, userId);
+            int noOfRecords = pstmt.executeUpdate();
+            pstmt.close();
+        }
+        catch (SQLException sqlExcept)
+        {
+            sqlExcept.printStackTrace();
+        }
+    }
+    
+    private static void loginUsers()
+    {
+        try
+        {
+            Scanner sc= new Scanner(System.in);
+            boolean login_success = false;
+            
+            System.out.println("Enter your username to update: ");
+            String userId = sc.nextLine();
+        
+            System.out.println("Enter your password to update: ");
+            String userPwd = sc.nextLine();
+            
+            pstmt = conn.prepareStatement(USER_SELECT_QUERY);
+            rs = pstmt.executeQuery();
 
-            System.out.println("\n-------------------------------------------------");
-
-            while(results.next())
+            while(rs.next())
             {
-                String userId = results.getString(1);
-                String userPwd = results.getString(2);
-                System.out.println(userId + "\t\t" + userPwd);
+                if(userId.equalsIgnoreCase(rs.getString(1)) && userPwd.equalsIgnoreCase(rs.getString(2)))
+                    login_success = true;
+                else
+                    continue;
             }
-            results.close();
-            stmt.close();
+            if (login_success == true)
+                System.out.println("User logged in successfully...");
+            else
+                System.out.println("UserId or Password is wrong...");
+            
+            rs.close();
+            //stmt.close();
         }
         catch (SQLException sqlExcept)
         {
@@ -116,7 +175,7 @@ public class F2GUserMain {
             }
             if (conn != null)
             {
-                DriverManager.getConnection(dbURL + ";shutdown=true");
+                //DriverManager.getConnection(dbURL + ";shutdown=true");
                 conn.close();
             }           
         }
