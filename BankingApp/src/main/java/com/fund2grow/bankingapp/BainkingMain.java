@@ -16,7 +16,7 @@ import java.util.Scanner;
  */
 public class BainkingMain {
     
-   private static Connection conn = null;
+    private static Connection conn = null;
     private static final Statement stmt = null;
     private static PreparedStatement pstmt = null;
     private static ResultSet rs = null;
@@ -24,13 +24,18 @@ public class BainkingMain {
     private static final String GET_ACCT_DETAILS_QUERY = "select * from BANK.YGR_BANK where ACCT_NUMBER=?";
     private static final String UPDATE_BALANCE_QUERY = "update BANK.YGR_BANK set BALANCE=? where ACCT_NUMBER=?";
     private static final String USER_DELETE_QUERY = "delete from BANK.YGR_BANK where USERID=?";
-    private static final String USER_SELECT_QUERY = "select USERID, PASSWORD from BANK.YGR_BANK";
+    private static final String USER_SELECT_QUERY = "select USERNAME, PASSWORD from BANK.YGR_BANK";
     private static final String GET_NEXT_ACCT_QUERY = "select ACCT_NUMBER from BANK.YGR_BANK";
     private static final String CLOSE_ACCT_QUERY = "update BANK.YGR_BANK set ACCT_ACTIVE=false where ACCT_NUMBER=?";
     
     public static void main(String[] args) {
         Scanner sc= new Scanner(System.in);
-            
+        createConnection();
+        
+        System.out.println("------- Welcome to YGR Bank website -------");
+        System.out.println("To access YGR Bank's website you need to login first!");
+        loginUser();
+        
         System.out.println("------- Welcome to YGR Bank website -------");
         System.out.println("1. Create an Account");
         System.out.println("2. Deposit Money");
@@ -39,7 +44,6 @@ public class BainkingMain {
         System.out.println("5. Close Account");
         System.out.println("Enter your choice:");
         String choice = sc.nextLine();
-        createConnection();
         
         if (choice.equalsIgnoreCase("1"))
             createAccount();
@@ -51,8 +55,8 @@ public class BainkingMain {
             checkBalance();
         else if(choice.equalsIgnoreCase("5"))
             closeAccount();
-        else if(choice.equalsIgnoreCase("6"))
-            createAccount();
+        else 
+            System.out.println("You entered a wrong choice! Quitting!");
         //shutdown();
     }
     
@@ -261,26 +265,28 @@ public class BainkingMain {
             Scanner sc= new Scanner(System.in);
             boolean login_success = false;
             
-            System.out.println("Enter your username to update: ");
+            System.out.println("Enter your username : ");
             String userId = sc.nextLine();
         
-            System.out.println("Enter your password to update: ");
+            System.out.println("Enter your password : ");
             String userPwd = sc.nextLine();
             
             pstmt = conn.prepareStatement(USER_SELECT_QUERY);
             rs = pstmt.executeQuery();
-
             while(rs.next())
             {
-                if(userId.equalsIgnoreCase(rs.getString(1)) && userPwd.equalsIgnoreCase(rs.getString(2)))
+                if(userId.equalsIgnoreCase(rs.getString(1)) && userPwd.equalsIgnoreCase(rs.getString(2))) {
                     login_success = true;
-                else
-                    continue;
+                }
             }
-            if (login_success == true)
+            if (login_success == true) {
                 System.out.println("User logged in successfully...");
-            else
+                return;
+            }
+            else {
                 System.out.println("UserId or Password is wrong...");
+                System.exit(0);
+            }
             
             rs.close();
             //stmt.close();
