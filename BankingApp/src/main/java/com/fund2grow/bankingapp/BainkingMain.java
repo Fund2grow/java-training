@@ -14,7 +14,7 @@ import java.util.Scanner;
  *
  * @author Administrator
  */
-public class BainkingMain {
+public class BankingMain {
     
     private static Connection conn = null;
     private static final Statement stmt = null;
